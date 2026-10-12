@@ -60,3 +60,27 @@ document.querySelectorAll(".shot, .certificate-photo").forEach(button => button.
 }));
 lightbox?.querySelector(".close")?.addEventListener("click", () => lightbox.close());
 lightbox?.addEventListener("click", event => { if (event.target === lightbox) lightbox.close(); });
+
+// Reveal page sections and their key cards as they enter the viewport.
+const revealTargets = document.querySelectorAll(
+  ".hero-copy, .hero-art, .hero-bottom, .section, .flagship, .project-card, " +
+  ".tool-grid article, .timeline article, .resume-layout > *, .edu-grid > article, " +
+  ".certificate-photo-card, .other-certificate, .contact-grid > *, .footer > *"
+);
+if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.body.classList.add("motion-ready");
+  revealTargets.forEach((element, index) => {
+    element.dataset.reveal = "";
+    element.style.setProperty("--reveal-delay", `${(index % 5) * 65}ms`);
+  });
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      revealObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.08, rootMargin: "0px 0px -5% 0px" });
+  revealTargets.forEach(element => revealObserver.observe(element));
+} else {
+  revealTargets.forEach(element => element.classList.add("is-visible"));
+}
